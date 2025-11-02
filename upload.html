@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать видео - CREATE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: #0f0f0f; color: white; padding: 40px 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .back-btn { background: #333; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 30px; }
+        .upload-form { background: #282828; padding: 30px; border-radius: 8px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 12px; background: #404040; border: 1px solid #555; border-radius: 4px; color: white; }
+        textarea { height: 100px; resize: vertical; }
+        .submit-btn { background: #ff0000; color: white; padding: 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        .preview { margin-top: 10px; }
+        video { max-width: 100%; max-height: 200px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='index.html'">← Назад</button>
+        
+        <div class="upload-form">
+            <h2>📹 СОЗДАТЬ НОВОЕ ВИДЕО</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Название видео:</label>
+                    <input type="text" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Описание:</label>
+                    <textarea name="description"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Выберите видео файл:</label>
+                    <input type="file" name="video" accept="video/*" required>
+                    <div class="preview">
+                        <video id="videoPreview" controls style="display:none;"></video>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">🚀 ОПУБЛИКОВАТЬ ВИДЕО</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Предпросмотр видео
+        document.querySelector('input[name="video"]').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const videoPreview = document.getElementById('videoPreview');
+                videoPreview.src = URL.createObjectURL(file);
+                videoPreview.style.display = 'block';
+            }
+        });
+
+        // Отправка формы
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('server.php?action=upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Видео успешно опубликовано!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('❌ Ошибка: ' + result.error);
+                }
+            } catch (error) {
+                alert('❌ Ошибка загрузки');
+            }
+        });
+    </script>
+</body>
+</html>
