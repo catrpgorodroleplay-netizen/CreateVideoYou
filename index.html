@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CREATE - Видео Хостинг</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: #0f0f0f; color: white; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .logo { color: #ff0000; font-size: 32px; font-weight: bold; }
+        .create-btn { background: #ff0000; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .video-card { background: #282828; border-radius: 8px; overflow: hidden; }
+        .video-player { width: 100%; height: 200px; background: #000; }
+        .video-info { padding: 15px; }
+        .video-title { font-size: 18px; margin-bottom: 8px; }
+        .video-views { color: #aaa; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">CREATE</div>
+        <button class="create-btn" onclick="window.location.href='upload.html'">
+            📹 СОЗДАТЬ ВИДЕО
+        </button>
+    </div>
+
+    <div class="video-grid" id="videoGrid">
+        <!-- Видео загружаются здесь -->
+    </div>
+
+    <script>
+        // Загружаем видео при загрузке страницы
+        async function loadVideos() {
+            try {
+                const response = await fetch('server.php?action=get_videos');
+                const videos = await response.json();
+                
+                const videoGrid = document.getElementById('videoGrid');
+                videoGrid.innerHTML = videos.map(video => `
+                    <div class="video-card">
+                        <video class="video-player" controls>
+                            <source src="videos/${video.filename}" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-views">👁️ ${video.views} просмотров</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('videoGrid').innerHTML = '<p>Ошибка загрузки видео</p>';
+            }
+        }
+
+        loadVideos();
+    </script>
+</body>
+</html>
